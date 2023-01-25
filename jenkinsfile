@@ -14,8 +14,16 @@ pipeline {
         }
         stage('Release') {
             steps {
-                sh "docker build -t serdar52/java-17-demo:${BUILD_NUMBER} ."
+                withCredentials([usernamePassword(credentialsId: 'dockerhubcredentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+
+                
+                sh ''' 
+                docker login -u $USERNAME -p $PASSWORD
+                docker build -t serdar52/java-17-demo:${BUILD_NUMBER} .                
+                docker push serdar52/java-17-demo:${BUILD_NUMBER}
+                '''
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                }
             }
         }
     }
